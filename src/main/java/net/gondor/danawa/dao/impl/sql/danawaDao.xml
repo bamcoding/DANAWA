@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="danawaDao">
+	<select id="getDanawaCount" resultType="_int" parameterType="DanawaSearchVO">
+		SELECT	/* [danawaDao.xml][getDanawaCount] */
+					COUNT(1)
+		FROM	DANAWA
+		WHERE	DNW_ID IS NOT NULL
+		<if test="keyword!=null">
+		AND	DNW_SBJ LIKE '%' || #{keyword} || '%'
+		</if>
+		AND	DNW_PRICE >= #{startPrice}
+		<if test="endPrice > startPrice">
+			AND	DNW_PRICE <![CDATA[<=]]> #{endPrice}
+		</if>
+	</select>
+	<select id="getAllDanawaList" resultType="DanawaVO" parameterType="DanawaSearchVO">
+	SELECT	*
+	FROM	(
+					SELECT	A.*
+								,ROWNUM RNUM		
+					FROM	(	
+									SELECT	/* [danawaDao.xml][getAllDanawaList] */
+												DNW_ID id
+												, DNW_SBJ subject
+												, DNW_CONT content
+												, DNW_PRICE price
+											    , TO_CHAR(DNW_CRT_DT,'YYYY.MM.DD') createdDate
+											    , DNW_DP_FL_NM displayFileName
+											    , DNW_RL_FL_NM realFileName
+									FROM	DANAWA
+									WHERE	DNW_ID IS NOT NULL
+									<if test="keyword!=null">
+									AND	DNW_SBJ LIKE '%' || #{keyword} || '%'
+									</if>
+									AND	DNW_PRICE >= #{startPrice}
+									<if test="endPrice > startPrice">
+										AND	DNW_PRICE <![CDATA[<=]]> #{endPrice}
+									</if>
+									<if test="align=='desc'">
+									ORDER	BY	DNW_PRICE DESC
+									</if>
+									<if test="align=='asc'">
+									ORDER	BY	DNW_PRICE ASC
+									</if>
+									<if test="align=='new'">
+									ORDER	BY	DNW_CRT_DT DESC
+									</if>
+								) A
+					WHERE	ROWNUM <![CDATA[<=]]> #{endNumber}
+				)
+	WHERE	RNUM >= #{startNumber}		
+	</select>
+	<select id="getDanawaById" resultType="DanawaVO" parameterType="string">
+		SELECT	/* [danawaDao.xml][getDanawaById] */
+					DNW_ID id
+					, DNW_SBJ subject
+					, DNW_CONT content
+					, DNW_PRICE price
+				    , TO_CHAR(DNW_CRT_DT,'YYYY.MM.DD HH:MI:SS') createdDate
+				    , DNW_DP_FL_NM displayFileName
+				    , DNW_RL_FL_NM realFileName
+		FROM	DANAWA
+		WHERE	DNW_ID = #{id}
+	</select>
+	<delete id="removeDanawaById" parameterType="string">
+		DELETE	/* [danawaDao.xml][removeDanawaById] */
+		FROM	DANAWA
+		WHERE	DNW_ID = #{id}
+	</delete>
+	<insert id="addDanawa" parameterType="DanawaVO">
+		INSERT INTO 	/* [danawaDao.xml][addDanawa] */
+		DANAWA (
+				DNW_ID
+				, DNW_SBJ
+				, DNW_CONT
+				, DNW_PRICE
+			    , DNW_CRT_DT
+			    , DNW_DP_FL_NM
+			    , DNW_RL_FL_NM) 
+		VALUES ( 
+				'DNW-'||TO_CHAR(SYSDATE, 'YYMMDD')||'-'||LPAD(DNW_ID_SEQ.NEXTVAL,6,0)
+				, #{subject}
+				, #{content}
+				, #{price}
+				, SYSDATE
+				, #{displayFileName}
+				, #{realFileName})
+	</insert>
+	<update id="editDanawa" parameterType="DanawaVO">
+	 	UPDATE	/* [danawaDao.xml][editDanawa] */
+	 			DANAWA
+	 	SET		DNW_SBJ = #{subject}
+	 			, DNW_CONT = #{content}
+	 	WHERE	DNW_ID = #{id}
+	</update>
+	 
+</mapper>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<bean	id="danawaService"
+		class="net.gondor.danawa.service.impl.DanawaServiceImpl">
+	<property name="danawaBiz" ref="danawaBiz"></property>
+</bean>
+
+<bean	id="danawaBiz"
+		class="net.gondor.danawa.biz.impl.DanawaBizImpl">
+	<property name="danawaDao" ref="danawaDao"></property>
+</bean>
+
+<bean	id="danawaDao"
+		class="net.gondor.danawa.dao.impl.DanawaDaoImpl">
+	<property name="sqlSessionTemplate" ref="sqlSessionTemplate"></property>
+</bean>
+
+</beans>
